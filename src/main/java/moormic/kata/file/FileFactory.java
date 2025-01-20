@@ -23,7 +23,7 @@ public final class FileFactory {
         try (var outputStream = new FileOutputStream(file)) {
             outputStream.write(bytes);
         } catch (IOException e) {
-            System.out.printf("Unable to write to file %s. Error: %s/n", uuid, e.getMessage());
+            System.out.printf("Unable to write to file %s. Error: %s\n", uuid, e.getMessage());
         }
         return file;
     }
