@@ -17,7 +17,8 @@ import java.util.stream.IntStream;
 @ComponentScan(basePackages = {"moormic.kata"})
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class S3Application implements CommandLineRunner {
-    private static final int RUN_NUMBER = 100;          // publish 100 files
+    private static final int RUN_NUMBER = 1000;
+    private static final int FILE_SIZE = 10_000;
     private static final String BUCKET_NAME = "s3-kata";
     private final S3Repository s3Repository;
 
@@ -27,13 +28,16 @@ public class S3Application implements CommandLineRunner {
     }
 
     public void run(String... args) {
+        var start = Instant.now();
         IntStream.range(0, RUN_NUMBER).forEach(i -> {
-            var file = FileFactory.get();
-            var start = Instant.now();
+            var file = FileFactory.getRandom(FILE_SIZE);
             s3Repository.put(BUCKET_NAME, file);
-            var end = Instant.now();
-            System.out.printf("Published file # %d. Took %d seconds\n", i, Duration.between(start, end).getSeconds());
         });
+        var end = Instant.now();
+        var timeTaken = Duration.between(start, end).getSeconds();
+        var bytesUploaded = RUN_NUMBER * FILE_SIZE;
+        var throughput = bytesUploaded / timeTaken;
+        System.out.printf("With file size %d, throughput is %d", FILE_SIZE, throughput);
     }
 
 }

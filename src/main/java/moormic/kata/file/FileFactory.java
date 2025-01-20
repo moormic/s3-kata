@@ -12,12 +12,11 @@ import java.util.UUID;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FileFactory {
-    private static final int FILE_SIZE_BYTES = 10_000_000;      // 10MB file
     private static final Random RANDOM = new Random(Instant.now().getEpochSecond());
 
-    public static File get() {
+    public static File getRandom(int size) {
         var uuid = UUID.randomUUID();
-        var bytes = new byte[FILE_SIZE_BYTES];
+        var bytes = new byte[size];
         RANDOM.nextBytes(bytes);
 
         var file = new File(uuid.toString());
