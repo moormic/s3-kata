@@ -1,4 +1,4 @@
-package moormic.kata.config;
+package moormic.kata.s3.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

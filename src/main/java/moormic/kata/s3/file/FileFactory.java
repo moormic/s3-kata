@@ -1,4 +1,4 @@
-package moormic.kata.file;
+package moormic.kata.s3.file;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

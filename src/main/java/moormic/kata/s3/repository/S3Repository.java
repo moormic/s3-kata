@@ -1,6 +1,7 @@
-package moormic.kata.repository;
+package moormic.kata.s3.repository;
 
-import moormic.kata.config.S3Configuration;
+import com.google.common.collect.Lists;
+import moormic.kata.s3.config.S3Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -51,6 +52,7 @@ public class S3Repository {
 
     public void delete(String bucketName, List<String> keys) {
         var objectsToDelete = keys.stream().map(key -> ObjectIdentifier.builder().key(key).build()).toList();
-        s3Client.deleteObjects(request -> request.bucket(bucketName).delete(delete -> delete.objects(objectsToDelete)));
+        var partitions = Lists.partition(objectsToDelete, 1000);
+        partitions.forEach(partition -> s3Client.deleteObjects(request -> request.bucket(bucketName).delete(delete -> delete.objects(partition))));
     }
 }

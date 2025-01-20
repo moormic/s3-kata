@@ -1,8 +1,8 @@
-package moormic.kata;
+package moormic.kata.s3;
 
 import lombok.RequiredArgsConstructor;
-import moormic.kata.file.FileFactory;
-import moormic.kata.repository.S3Repository;
+import moormic.kata.s3.file.FileFactory;
+import moormic.kata.s3.repository.S3Repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,7 +19,7 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class S3Application implements CommandLineRunner {
     private static final int RUN_NUMBER = 1000;
-    private static final int FILE_SIZE = 10_000;
+    private static final int FILE_SIZE = 1000;
     private static final String BUCKET_NAME = "s3-kata";
     private final S3Repository s3Repository;
 
@@ -29,7 +29,7 @@ public class S3Application implements CommandLineRunner {
     }
 
     public void run(String... args) {
-        uploadFiles();
+//        uploadFiles();
         cleanupFiles();
     }
 
@@ -52,5 +52,4 @@ public class S3Application implements CommandLineRunner {
         s3Repository.delete(BUCKET_NAME, keys);
         System.out.printf("Deleted %d objects in %s\n", objects.size(), BUCKET_NAME);
     }
-
 }
