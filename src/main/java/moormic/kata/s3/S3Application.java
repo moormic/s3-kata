@@ -10,8 +10,10 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
+import java.io.File;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.stream.IntStream;
 
 @SpringBootApplication
@@ -19,7 +21,7 @@ import java.util.stream.IntStream;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class S3Application implements CommandLineRunner {
     private static final int RUN_NUMBER = 1000;
-    private static final int FILE_SIZE = 1000;
+    private static final int FILE_SIZE = 100000;
     private static final String BUCKET_NAME = "s3-kata";
     private final S3Repository s3Repository;
 
@@ -29,21 +31,25 @@ public class S3Application implements CommandLineRunner {
     }
 
     public void run(String... args) {
-//        uploadFiles();
+        var files = createFiles();
+        uploadFiles(files);
         cleanupFiles();
     }
 
-    private void uploadFiles() {
+    private List<File> createFiles() {
+        return IntStream.range(0, RUN_NUMBER)
+                .mapToObj(FileFactory::getRandom)
+                .toList();
+    }
+
+    private void uploadFiles(List<File> files) {
         var start = Instant.now();
-        IntStream.range(0, RUN_NUMBER).forEach(i -> {
-            var file = FileFactory.getRandom(FILE_SIZE);
-            s3Repository.put(BUCKET_NAME, file);
-        });
+        files.forEach(file -> s3Repository.put(BUCKET_NAME, file));
         var end = Instant.now();
         var timeTaken = Duration.between(start, end).getSeconds();
         var bytesUploaded = RUN_NUMBER * FILE_SIZE;
         var bytesThroughput = bytesUploaded / timeTaken;
-        System.out.printf("With file size %d, throughput is %d bytes per second.\n", FILE_SIZE, bytesThroughput);
+        System.out.printf("With file size %d, upload throughput is %d bytes per second.\n", FILE_SIZE, bytesThroughput);
     }
 
     private void cleanupFiles() {
