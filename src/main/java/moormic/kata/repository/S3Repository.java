@@ -8,6 +8,9 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.Bucket;
+import software.amazon.awssdk.services.s3.model.Delete;
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.io.File;
 import java.util.HashMap;
@@ -42,5 +45,14 @@ public class S3Repository {
                         .metadata(metadata)
                         .ifNoneMatch("*"),
                 file.toPath());
+    }
+
+    public List<S3Object> list(String bucketName) {
+        return s3Client.listObjectsV2(request -> request.bucket(bucketName).build()).contents();
+    }
+
+    public void delete(String bucketName, List<String> keys) {
+        var objectsToDelete = keys.stream().map(key -> ObjectIdentifier.builder().key(key).build()).toList();
+        s3Client.deleteObjects(request -> request.bucket(bucketName).delete(delete -> delete.objects(objectsToDelete)));
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.annotation.ComponentScan;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -28,6 +29,11 @@ public class S3Application implements CommandLineRunner {
     }
 
     public void run(String... args) {
+        uploadFiles();
+        cleanupFiles();
+    }
+
+    private void uploadFiles() {
         var start = Instant.now();
         IntStream.range(0, RUN_NUMBER).forEach(i -> {
             var file = FileFactory.getRandom(FILE_SIZE);
@@ -36,8 +42,15 @@ public class S3Application implements CommandLineRunner {
         var end = Instant.now();
         var timeTaken = Duration.between(start, end).getSeconds();
         var bytesUploaded = RUN_NUMBER * FILE_SIZE;
-        var throughput = bytesUploaded / timeTaken;
-        System.out.printf("With file size %d, throughput is %d", FILE_SIZE, throughput);
+        var bytesThroughput = bytesUploaded / timeTaken;
+        System.out.printf("With file size %d, throughput is %d bytes per second.\n", FILE_SIZE, bytesThroughput);
+    }
+
+    private void cleanupFiles() {
+        var objects = s3Repository.list(BUCKET_NAME);
+        var keys = objects.stream().map(S3Object::key).toList();
+        s3Repository.delete(BUCKET_NAME, keys);
+        System.out.printf("Deleted %d objects in %s\n", objects.size(), BUCKET_NAME);
     }
 
 }
