@@ -46,7 +46,7 @@ public class S3Application implements CommandLineRunner {
         uploadFiles(files);
         files.forEach(File::delete);
         var end = Instant.now();
-        log.info("Uploaded {} files to S3 in {} seconds", files.size(), Duration.between(start, end).getSeconds());
+        System.out.printf("Uploaded %s files to S3 in %d seconds\n", files.size(), Duration.between(start, end).getSeconds());
         //cleanupFiles();
     }
 
